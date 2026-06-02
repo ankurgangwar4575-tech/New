@@ -6,8 +6,13 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev":"nodemon -r dotenv/config --experimental-json-modules server.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose-aggregate-paginate-v2": "^1.1.4"
+  }
 }
