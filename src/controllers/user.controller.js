@@ -6,7 +6,7 @@ import { apiResponse } from "../utils/apiResponse.js";
 
 const generateAccessTokenAndRefreshTokens = async (userId) => {
   try {
-    const user = User.findById(userId);
+    const user = await User.findById(userId);
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
     user.refreshToken = refreshToken;
@@ -15,7 +15,7 @@ const generateAccessTokenAndRefreshTokens = async (userId) => {
   } catch (error) {
     throw new apiError(
       500,
-      "Something went wrong while generating refresh and acces token"
+      "Something went wrong while generating refresh and access token"
     );
   }
 };
@@ -109,13 +109,13 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!findUser) {
     throw new apiError(404, "User does not exist");
   }
-  const isPasswordValid = await user.isPasswordCorrect(password);
+  const isPasswordValid = await findUser.isPasswordCorrect(password);
   if (!isPasswordValid) {
     throw new apiError(401, "Password is invalid");
   }
   const { accessToken, refreshToken } =
-    await generateAccessTokenAndRefreshTokens(user._id);
-  const loggedInUser = await User.findById(user._id).select(
+    await generateAccessTokenAndRefreshTokens(findUser._id);
+  const loggedInUser = await User.findById(findUser._id).select(
     "-password -refreshToken"
   );
   const options = {
