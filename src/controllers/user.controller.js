@@ -284,27 +284,16 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 const updateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
   if (!coverImageLocalPath) {
-    throw new apiError(401, "Cover image is missing");
+    throw new apiError(400, "Cover image is missing");
   }
-  const oldUser = await User.findById(req.user?._id);
-  const oldCoverImageUrl = oldUser.coverImage;
+  const user = await User.findById(req.user?._id).select("-password");
+  const oldCoverImageUrl = user.coverImage;
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
   if (!coverImage.url) {
     throw new apiError(401, "Error while updating cover image");
   }
-
-  const user = await User.findByIdAndUpdate(
-    req.user?._id,
-    {
-      $set: {
-        coverImage: coverImage.url,
-      },
-    },
-    {
-      new: true,
-    }
-  ).select("-password");
-
+  user.coverImage = coverImage.url;
+  await user.save({ validateBeforeSave: false });
   await deleteFromCloudinary(oldCoverImageUrl);
   return res
     .status(200)
